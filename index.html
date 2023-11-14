@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div>
+        <div class="inputs">
+            <input type="text" placeholder="Digite o nome do pokemon" class="search-pesq">
+            <button class="button-pesq">Enviar</button>
+        </div>
+        
+
+        <div class="card">
+
+        </div>
+    </div>
+
+    <div id="pokemons-area">
+
+    </div>
+
+
+    <div class="mostrarDetalhes" style="display: none;">
+        <img src="" alt="" class="imagem-pokemon">
+        <h1 class="name-pokemon"></h1>
+        <p class="type-pokemon"></p>
+        <a href="#" class="voltar">Voltar</a>
+    </div>
+
+    <script>
+        function pesquisarPokemon(){
+            document.querySelector('.button-pesq').addEventListener('click', () => {
+                const searchInput = document.querySelector('.search-pesq').value
+                const areaCard = document.querySelector('.card')
+                const areaPokemon = document.querySelector("#pokemons-area")
+
+                areaPokemon.innerHTML = ""
+                areaCard.innerHTML = ""
+
+
+
+                const pokeApi = fetch(`https://pokeapi.co/api/v2/pokemon/${searchInput}`)
+
+                .then(data => data.json())
+                .then(pokemon => {
+                    const cardPoke = document.createElement('div')
+                
+                    cardPoke.innerHTML  = `
+                    <img src="${pokemon.sprites.front_default}"/> 
+                    <p>${pokemon.name}</p>`
+                    
+                    cardPoke.addEventListener('click', () => mostrarDetalhes(pokemon))
+
+                    areaCard.appendChild(cardPoke)
+                })
+
+                .catch(error => {
+                    alert("Pokemon Não encontrado")
+                    location.reload()
+                })
+            })
+        }
+
+        function mostrarPokemons(){
+            const areaPokemon = document.querySelector("#pokemons-area");
+
+            for(let i = 1; i < 50; i++){
+            fetch(`https://pokeapi.co/api/v2/pokemon/${i}`)
+            .then(data => data.json())
+            .then(pokemon => {
+
+                const card = document.createElement('div')
+                
+                card.innerHTML  = `
+                <img src="${pokemon.sprites.front_default}"/> 
+                <p>${pokemon.name}</p>`
+                
+                card.addEventListener('click', () => mostrarDetalhes(pokemon))
+
+                areaPokemon.appendChild(card)
+            })
+            }
+        }
+
+        function mostrarDetalhes(pokemon){
+            document.querySelector('#pokemons-area').style.display = "none"
+            document.querySelector('.card').style.display = "none"
+            document.querySelector('.inputs').style.display = "none"
+            document.querySelector('.mostrarDetalhes').style.display = "block"
+
+            const nomePokemon = document.querySelector('.name-pokemon')
+            const typePokemon = document.querySelector('.type-pokemon')
+            const imagemPokemon = document.querySelector('.imagem-pokemon')
+
+            imagemPokemon.src = pokemon.sprites.front_default
+            nomePokemon.textContent = `Nome: ${pokemon.name}`
+            typePokemon.textContent = `Tipo: ${pokemon.types.map(type => type.type.name).join(', ')}`;
+        }
+
+        function voltar(){
+            document.querySelector('.voltar').addEventListener('click', () =>{
+                document.querySelector('#pokemons-area').style.display = "block"
+                document.querySelector('.card').style.display = "block"
+                document.querySelector('.inputs').style.display = "block"
+                document.querySelector('.mostrarDetalhes').style.display = "none"
+            })
+        }
+
+        voltar()
+        mostrarPokemons()
+        pesquisarPokemon()
+    </script>
+</body>
+</html>
